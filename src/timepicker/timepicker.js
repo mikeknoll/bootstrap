@@ -56,20 +56,16 @@ angular.module('ui.bootstrap.timepicker', [])
   }
 
   var min;
-  if ($attrs.min) {
-    $scope.$parent.$watch($parse($attrs.min), function(value) {
-      var dt = new Date(value);
-      min = isNaN(dt) ? undefined : dt;
-    });
-  }
+  $scope.$parent.$watch($parse($attrs.min), function(value) {
+    var dt = new Date(value);
+    min = isNaN(dt) ? undefined : dt;
+  });
 
   var max;
-  if ($attrs.max) {
-    $scope.$parent.$watch($parse($attrs.max), function(value) {
-      var dt = new Date(value);
-      max = isNaN(dt) ? undefined : dt;
-    });
-  }
+  $scope.$parent.$watch($parse($attrs.max), function(value) {
+    var dt = new Date(value);
+    max = isNaN(dt) ? undefined : dt;
+  });
 
   $scope.noIncrementHours = function() {
     var incrementedSelected = addMinutes( selected, hourStep * 60 );
