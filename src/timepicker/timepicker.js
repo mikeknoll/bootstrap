@@ -310,8 +310,9 @@ angular.module('ui.bootstrap.timepicker', [])
 
   function addMinutes( date,  minutes ) {
     var dt = new Date( date.getTime() + minutes * 60000 );
-    var newDate = new Date( date.getTime() ).setHours( dt.getHours(), dt.getMinutes() );
-    return new Date( newDate );
+    var newDate = new Date( date );
+    newDate.setHours( dt.getHours(), dt.getMinutes() );
+    return newDate;
   }
 
   function addMinutesToSelected( minutes ) {
