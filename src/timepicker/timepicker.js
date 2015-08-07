@@ -69,22 +69,22 @@ angular.module('ui.bootstrap.timepicker', [])
 
   $scope.noIncrementHours = function() {
     var incrementedSelected = addMinutes( selected, hourStep * 60 );
-    return incrementedSelected > max || (min && incrementedSelected < selected);
+    return incrementedSelected > max || (incrementedSelected < selected && incrementedSelected < min);
   };
 
   $scope.noDecrementHours = function() {
     var decrementedSelected = addMinutes( selected, - hourStep * 60 );
-    return decrementedSelected < min || (max && decrementedSelected > selected);
+    return decrementedSelected < min || (decrementedSelected > selected && decrementedSelected > max);
   };
 
   $scope.noIncrementMinutes = function() {
     var incrementedSelected = addMinutes( selected, minuteStep );
-    return incrementedSelected > max || (min && incrementedSelected < selected);
+    return incrementedSelected > max || (incrementedSelected < selected && incrementedSelected < min);
   };
 
   $scope.noDecrementMinutes = function() {
     var decrementedSelected = addMinutes( selected, - minuteStep );
-    return decrementedSelected < min || (max && decrementedSelected > selected);
+    return decrementedSelected < min || (decrementedSelected > selected && decrementedSelected > max);
   };
 
   $scope.noToggleMeridian = function() {

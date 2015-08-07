@@ -14,8 +14,7 @@ describe('timepicker directive', function () {
 
   function newTime(hours, minutes) {
     var time = new Date();
-    time.setHours(hours);
-    time.setMinutes(minutes);
+    time.setHours(hours, minutes, 0, 0);
     return time;
   }
 
@@ -1125,35 +1124,71 @@ describe('timepicker directive', function () {
       expect(getModelState()).toEqual([14, 37]);
     });
 
-    it('should not increase hours when time would rollover', function() {
+    it('should not increase hours when time would rollover to a time earlier than min', function() {
       var up = getHoursButton(true);
       var inputs = element.find('input');
       var hoursEl = inputs.eq(0);
       var upMouseWheelEvent = wheelThatMouse(1);
       var upKeydownEvent = keydown('up');
 
-      $rootScope.time = newTime(23, 0);
+      $rootScope.time = newTime(23, 59);
       $rootScope.min = newTime(13, 40);
       $rootScope.$digest();
 
       expect(up.hasClass('disabled')).toBe(true);
 
       doClick(up);
-      expect(getTimeState()).toEqual(['11', '00', 'PM']);
-      expect(getModelState()).toEqual([23, 0]);
+      expect(getTimeState()).toEqual(['11', '59', 'PM']);
+      expect(getModelState()).toEqual([23, 59]);
 
       hoursEl.trigger( upMouseWheelEvent );
       $rootScope.$digest();
-      expect(getTimeState()).toEqual(['11', '00', 'PM']);
-      expect(getModelState()).toEqual([23, 0]);
+      expect(getTimeState()).toEqual(['11', '59', 'PM']);
+      expect(getModelState()).toEqual([23, 59]);
 
       hoursEl.trigger( upKeydownEvent );
       $rootScope.$digest();
-      expect(getTimeState()).toEqual(['11', '00', 'PM']);
-      expect(getModelState()).toEqual([23, 0]);
+      expect(getTimeState()).toEqual(['11', '59', 'PM']);
+      expect(getModelState()).toEqual([23, 59]);
     });
 
-    it('should not increase minutes when time would rollover', function() {
+    it('should increase hours when time would rollover to a time not earlier than min', function() {
+      var up = getHoursButton(true);
+      var inputs = element.find('input');
+      var hoursEl = inputs.eq(0);
+      var upMouseWheelEvent = wheelThatMouse(1);
+      var upKeydownEvent = keydown('up');
+
+      $rootScope.min = newTime(0, 0);
+
+      $rootScope.time = newTime(23, 59);
+      $rootScope.$digest();
+
+      expect(up.hasClass('disabled')).toBe(false);
+
+      doClick(up);
+      expect(getTimeState()).toEqual(['12', '59', 'AM']);
+      expect(getModelState()).toEqual([0, 59]);
+
+      $rootScope.time = newTime(23, 59);
+      $rootScope.$digest();
+
+      hoursEl.trigger( upMouseWheelEvent );
+      $rootScope.$digest();
+      expect(getTimeState()).toEqual(['12', '59', 'AM']);
+      expect(getModelState()).toEqual([0, 59]);
+
+      $rootScope.time = newTime(23, 59);
+      $rootScope.$digest();
+
+      hoursEl.trigger( upKeydownEvent );
+      $rootScope.$digest();
+      expect(getTimeState()).toEqual(['12', '59', 'AM']);
+      expect(getModelState()).toEqual([0, 59]);
+    });
+
+
+    it('should not increase minutes when time would rollover to a time earlier than min', function() {
       var up = getMinutesButton(true);
       var inputs = element.find('input');
       var minutessEl = inputs.eq(1);
@@ -1179,6 +1214,41 @@ describe('timepicker directive', function () {
       $rootScope.$digest();
       expect(getTimeState()).toEqual(['11', '59', 'PM']);
       expect(getModelState()).toEqual([23, 59]);
+    });
+
+    it('should increase minutes when time would rollover to a time not earlier than min', function() {
+      var up = getMinutesButton(true);
+      var inputs = element.find('input');
+      var minutessEl = inputs.eq(1);
+      var upMouseWheelEvent = wheelThatMouse(1);
+      var upKeydownEvent = keydown('up');
+
+      $rootScope.min = newTime(0, 0);
+
+      $rootScope.time = newTime(23, 59);
+      $rootScope.$digest();
+
+      expect(up.hasClass('disabled')).toBe(false);
+
+      doClick(up);
+      expect(getTimeState()).toEqual(['12', '00', 'AM']);
+      expect(getModelState()).toEqual([0, 0]);
+
+      $rootScope.time = newTime(23, 59);
+      $rootScope.$digest();
+
+      minutessEl.trigger( upMouseWheelEvent );
+      $rootScope.$digest();
+      expect(getTimeState()).toEqual(['12', '00', 'AM']);
+      expect(getModelState()).toEqual([0, 0]);
+
+      $rootScope.time = newTime(23, 59);
+      $rootScope.$digest();
+
+      minutessEl.trigger( upKeydownEvent );
+      $rootScope.$digest();
+      expect(getTimeState()).toEqual(['12', '00', 'AM']);
+      expect(getModelState()).toEqual([0, 0]);
     });
 
     it('should not change meridian when it would result a in time earlier than min', function() {
@@ -1382,35 +1452,70 @@ describe('timepicker directive', function () {
       expect(getModelState()).toEqual([14, 43]);
     });
 
-    it('should not decrease hours when time would rollover', function() {
+    it('should not decrease hours when time would rollover to a time later than max', function() {
       var down = getHoursButton(false);
       var inputs = element.find('input');
       var hoursEl = inputs.eq(0);
       var downMouseWheelEvent = wheelThatMouse(-1);
       var downKeydownEvent = keydown('down');
 
-      $rootScope.time = newTime(0, 59);
+      $rootScope.time = newTime(0, 0);
       $rootScope.max = newTime(13, 40);
       $rootScope.$digest();
 
       expect(down.hasClass('disabled')).toBe(true);
 
       doClick(down);
-      expect(getTimeState()).toEqual(['12', '59', 'AM']);
-      expect(getModelState()).toEqual([0, 59]);
+      expect(getTimeState()).toEqual(['12', '00', 'AM']);
+      expect(getModelState()).toEqual([0, 0]);
 
       hoursEl.trigger( downMouseWheelEvent );
       $rootScope.$digest();
-      expect(getTimeState()).toEqual(['12', '59', 'AM']);
-      expect(getModelState()).toEqual([0, 59]);
+      expect(getTimeState()).toEqual(['12', '00', 'AM']);
+      expect(getModelState()).toEqual([0, 0]);
 
       hoursEl.trigger( downKeydownEvent );
       $rootScope.$digest();
-      expect(getTimeState()).toEqual(['12', '59', 'AM']);
-      expect(getModelState()).toEqual([0, 59]);
+      expect(getTimeState()).toEqual(['12', '00', 'AM']);
+      expect(getModelState()).toEqual([0, 0]);
     });
 
-    it('should not decrease minutes when time would rollover', function() {
+    it('should decrease hours when time would rollover to a time not later than max', function() {
+      var down = getHoursButton(false);
+      var inputs = element.find('input');
+      var hoursEl = inputs.eq(0);
+      var downMouseWheelEvent = wheelThatMouse(-1);
+      var downKeydownEvent = keydown('down');
+
+      $rootScope.max = newTime(23, 59);
+
+      $rootScope.time = newTime(0, 0);
+      $rootScope.$digest();
+
+      expect(down.hasClass('disabled')).toBe(false);
+
+      doClick(down);
+      expect(getTimeState()).toEqual(['11', '00', 'PM']);
+      expect(getModelState()).toEqual([23, 0]);
+
+      $rootScope.time = newTime(0, 0);
+      $rootScope.$digest();
+
+      hoursEl.trigger( downMouseWheelEvent );
+      $rootScope.$digest();
+      expect(getTimeState()).toEqual(['11', '00', 'PM']);
+      expect(getModelState()).toEqual([23, 0]);
+
+      $rootScope.time = newTime(0, 0);
+      $rootScope.$digest();
+
+      hoursEl.trigger( downKeydownEvent );
+      $rootScope.$digest();
+      expect(getTimeState()).toEqual(['11', '00', 'PM']);
+      expect(getModelState()).toEqual([23, 0]);
+    });
+
+    it('should not decrease minutes when time would rollover to a time later than max', function() {
       var down = getMinutesButton(false);
       var inputs = element.find('input');
       var minutessEl = inputs.eq(1);
@@ -1436,6 +1541,41 @@ describe('timepicker directive', function () {
       $rootScope.$digest();
       expect(getTimeState()).toEqual(['12', '00', 'AM']);
       expect(getModelState()).toEqual([0, 0]);
+    });
+
+    it('should decrease minutes when time would rollover to a time not later than max', function() {
+      var down = getMinutesButton(false);
+      var inputs = element.find('input');
+      var minutessEl = inputs.eq(1);
+      var downMouseWheelEvent = wheelThatMouse(-1);
+      var downKeydownEvent = keydown('down');
+
+      $rootScope.max = newTime(23, 59);
+
+      $rootScope.time = newTime(0, 0);
+      $rootScope.$digest();
+
+      expect(down.hasClass('disabled')).toBe(false);
+
+      doClick(down);
+      expect(getTimeState()).toEqual(['11', '59', 'PM']);
+      expect(getModelState()).toEqual([23, 59]);
+
+      $rootScope.time = newTime(0, 0);
+      $rootScope.$digest();
+
+      minutessEl.trigger( downMouseWheelEvent );
+      $rootScope.$digest();
+      expect(getTimeState()).toEqual(['11', '59', 'PM']);
+      expect(getModelState()).toEqual([23, 59]);
+
+      $rootScope.time = newTime(0, 0);
+      $rootScope.$digest();
+
+      minutessEl.trigger( downKeydownEvent );
+      $rootScope.$digest();
+      expect(getTimeState()).toEqual(['11', '59', 'PM']);
+      expect(getModelState()).toEqual([23, 59]);
     });
 
     it('should not change meridian when it would result a in time later than max', function() {
